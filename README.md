@@ -27,7 +27,8 @@ integracion.js
 - Dashboard con estadísticas
 
 ## Ejecución
-Abrir `index.html` en el navegador.
+Abrir `index.html` en el navegador..
+O preferiblemente Live Server in Visual
 
 ## Notas
 - No requiere backend
