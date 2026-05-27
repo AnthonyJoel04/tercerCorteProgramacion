@@ -1,0 +1,1605 @@
+/* ========= VARIABLES (DISEÑO + TEMA) ========= */
+/* Define variables globales para colores, tamaños y sombras (fácil de mantener y enseñar) */
+:root {
+  /* Altura de la barra superior (header) */
+  --topbar-height: 56px;
+  /* Ancho del sidebar en escritorio */
+  --sidebar-width: 288px;
+  /* Ancho del sidebar cuando está colapsado */
+  --sidebar-width-collapsed: 84px;
+  /* Radio estándar para bordes redondeados */
+  --radius: 14px;
+  /* Espaciado base (usa múltiplos para consistencia visual) */
+  --space-1: 8px;
+  /* Espaciado medio */
+  --space-2: 12px;
+  /* Espaciado grande */
+  --space-3: 16px;
+  /* Espaciado extra grande */
+  --space-4: 24px;
+  /* Duración de animaciones (respeta prefers-reduced-motion más abajo) */
+  --motion-fast: 160ms;
+  /* Sombra sutil para separar capas en fondo oscuro */
+  --shadow-1: 0 10px 30px rgba(0, 0, 0, 0.35);
+  /* Tipografía base del sistema (buena performance y disponibilidad) */
+  --font: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+}
+
+/* Tema oscuro (predeterminado): se activa con data-theme="dark" en .app */
+.app[data-theme="dark"] {
+  /* Fondo principal (más oscuro para evitar zonas claras en modo oscuro) */
+  --bg: #050a14;
+  /* Superficie (tarjetas y paneles) */
+  --surface: #0a1326;
+  /* Superficie elevación (sidebar/topbar) */
+  --surface-2: #081022;
+  /* Borde sutil */
+  --border: rgba(255, 255, 255, 0.08);
+  /* Texto primario (blanco para máximo contraste en fondo oscuro) */
+  --text: #ffffff;
+  /* Texto secundario (sigue siendo blanco, pero con menos énfasis) */
+  --text-muted: rgba(255, 255, 255, 0.82);
+  /* Azul principal (acento) */
+  --primary: #1e88e5;
+  /* Azul secundario (hover y detalles) */
+  --primary-2: #42a5f5;
+  /* Estado peligro */
+  --danger: #ef5350;
+  /* Fondo de controles */
+  --control: rgba(255, 255, 255, 0.08);
+  /* Fondo de hover */
+  --hover: rgba(255, 255, 255, 0.08);
+  /* Contorno de foco accesible */
+  --focus: #90caf9;
+  /* Fondo del formulario (modal): azul del menú principal, pero más claro para diferenciar */
+  --form-surface: #0d2346;
+}
+
+/* Tema claro: se activa con data-theme="light" en .app */
+.app[data-theme="light"] {
+  /* Fondo principal claro */
+  --bg: #f3f7ff;
+  /* Superficie clara */
+  --surface: #ffffff;
+  /* Superficie alternativa */
+  --surface-2: #eef4ff;
+  /* Borde sutil */
+  --border: rgba(12, 20, 36, 0.12);
+  /* Texto primario */
+  --text: rgba(12, 20, 36, 0.92);
+  /* Texto secundario */
+  --text-muted: rgba(12, 20, 36, 0.68);
+  /* Azul principal (acento) */
+  --primary: #1565c0;
+  /* Azul secundario (hover y detalles) */
+  --primary-2: #1e88e5;
+  /* Estado peligro */
+  --danger: #d32f2f;
+  /* Fondo de controles */
+  --control: rgba(12, 20, 36, 0.06);
+  /* Fondo de hover */
+  --hover: rgba(12, 20, 36, 0.07);
+  /* Contorno de foco accesible */
+  --focus: #1565c0;
+  /* Fondo del formulario (modal): azul del menú principal, pero más claro para diferenciar */
+  --form-surface: #e6f0ff;
+}
+
+/* ========= RESET BÁSICO (MEJOR UX) ========= */
+/* Evita que el padding/border rompan el cálculo de tamaño (box model consistente) */
+*,
+*::before,
+*::after {
+  /* Incluye padding y border en width/height */
+  box-sizing: border-box;
+}
+
+/* Ajustes globales para el documento */
+html {
+  /* Suaviza el scroll cuando se usan anclas como #main */
+  scroll-behavior: smooth;
+}
+
+/* Ajustes del body */
+body {
+  /* Elimina márgenes por defecto del navegador */
+  margin: 0;
+  /* Aplica la tipografía base */
+  font-family: var(--font);
+  /* Fondo general (oscuro por defecto para evitar “pantalla blanca” si faltan variables) */
+  background: #000000;
+  /* Color de texto general (blanco por defecto para contraste) */
+  color: #ffffff;
+}
+
+/* Asegura que imágenes y SVG no excedan su contenedor */
+img,
+svg {
+  /* Mantiene tamaño máximo dentro del contenedor */
+  max-width: 100%;
+  /* Evita espacios extra por inline baseline */
+  display: block;
+}
+
+/* Estilos base para enlaces */
+a {
+  /* Hereda color para integrarse con el tema */
+  color: inherit;
+  /* Quita subrayado por defecto (se reintroduce con focus/hover) */
+  text-decoration: none;
+}
+
+/* ========= UTILIDADES ========= */
+/* Oculta contenido visualmente sin quitarlo del árbol de accesibilidad */
+.sr-only {
+  /* Saca el elemento del flujo visual sin eliminarlo */
+  position: absolute;
+  /* Dimensión mínima */
+  width: 1px;
+  /* Dimensión mínima */
+  height: 1px;
+  /* Quita padding */
+  padding: 0;
+  /* Margen negativo para que no ocupe espacio */
+  margin: -1px;
+  /* Oculta overflow */
+  overflow: hidden;
+  /* Recorta completamente */
+  clip: rect(0, 0, 0, 0);
+  /* Evita que se envuelva */
+  white-space: nowrap;
+  /* Elimina borde */
+  border: 0;
+}
+
+/* ========= TOOLTIP (tooltip-text) ========= */
+/* Elementos con data-tooltip generan un texto de ayuda al pasar el mouse */
+[data-tooltip] {
+  /* Necesario para posicionar el tooltip relativo al elemento */
+  position: relative;
+}
+
+/* Burbuja de texto del tooltip */
+[data-tooltip]::after {
+  /* Texto: se toma del atributo data-tooltip */
+  content: attr(data-tooltip);
+  /* Posicionamiento absoluto relativo al elemento */
+  position: absolute;
+  /* Se ubica centrado horizontalmente */
+  left: 50%;
+  /* Se ubica arriba del elemento */
+  bottom: calc(100% + 10px);
+  /* Centra la burbuja */
+  transform: translateX(-50%);
+  /* Tamaño máximo para evitar tooltips enormes */
+  max-width: 220px;
+  /* Evita que el tooltip se salga sin control */
+  width: max-content;
+  /* Ajusta ancho en pantallas pequeñas */
+  min-width: 120px;
+  /* Padding interno */
+  padding: 8px 10px;
+  /* Fondo oscuro para contraste */
+  background: rgba(0, 0, 0, 0.85);
+  /* Texto blanco */
+  color: #ffffff;
+  /* Tamaño legible */
+  font-size: 12px;
+  /* Interlineado */
+  line-height: 1.35;
+  /* Bordes redondeados */
+  border-radius: 10px;
+  /* Sombra para separar del fondo */
+  box-shadow: var(--shadow-1);
+  /* No captura eventos (no bloquea hover/click del elemento) */
+  pointer-events: none;
+  /* Oculto por defecto */
+  opacity: 0;
+  /* Animación suave */
+  transition: opacity var(--motion-fast) ease, transform var(--motion-fast) ease;
+  /* Evita cubrir elementos encima */
+  z-index: 60;
+  /* Permite saltos de línea si es necesario */
+  white-space: normal;
+}
+
+/* Flecha del tooltip */
+[data-tooltip]::before {
+  /* Pseudo-elemento para la flecha */
+  content: "";
+  /* Posicionamiento absoluto */
+  position: absolute;
+  /* Centrado */
+  left: 50%;
+  /* Ubica justo encima del elemento */
+  bottom: calc(100% + 4px);
+  /* Ajuste para centrar */
+  transform: translateX(-50%);
+  /* Triángulo con bordes */
+  border-width: 6px;
+  /* Estilo de borde */
+  border-style: solid;
+  /* Colores del triángulo: arriba transparente, abajo negro */
+  border-color: rgba(0, 0, 0, 0.85) transparent transparent transparent;
+  /* No captura eventos */
+  pointer-events: none;
+  /* Oculto por defecto */
+  opacity: 0;
+  /* Animación suave */
+  transition: opacity var(--motion-fast) ease;
+  /* Capa */
+  z-index: 60;
+}
+
+/* Muestra el tooltip al hacer hover o al enfocar con teclado */
+[data-tooltip]:hover::after,
+[data-tooltip]:focus-visible::after {
+  /* Hace visible el tooltip */
+  opacity: 1;
+  /* Ajuste leve para “subir” al aparecer */
+  transform: translateX(-50%) translateY(-2px);
+}
+
+/* Muestra la flecha al hacer hover o focus */
+[data-tooltip]:hover::before,
+[data-tooltip]:focus-visible::before {
+  /* Hace visible la flecha */
+  opacity: 1;
+}
+
+/* ========= ACCESIBILIDAD: FOCUS VISIBLE ========= */
+/* Muestra un contorno claro cuando el usuario navega con teclado */
+:focus-visible {
+  /* Contorno de 3px para ser notorio */
+  outline: 3px solid var(--focus);
+  /* Separación del contorno del elemento */
+  outline-offset: 3px;
+}
+
+/* Enlace de salto: se oculta visualmente hasta recibir foco */
+.skip-link {
+  /* Posiciona fuera de la pantalla para no interrumpir el diseño */
+  position: absolute;
+  /* Ubica arriba a la izquierda */
+  top: 8px;
+  /* Ubica a la izquierda */
+  left: 8px;
+  /* Coloca por encima del layout */
+  z-index: 9999;
+  /* Fondo para alto contraste */
+  background: var(--primary);
+  /* Texto en blanco para legibilidad */
+  color: #fff;
+  /* Padding para área clicable */
+  padding: 10px 12px;
+  /* Bordes redondeados */
+  border-radius: 10px;
+  /* Oculta desplazando hacia arriba */
+  transform: translateY(-140%);
+  /* Transición suave */
+  transition: transform var(--motion-fast) ease;
+}
+
+/* Muestra el enlace cuando el usuario lo enfoca con tab */
+.skip-link:focus-visible {
+  /* Devuelve el enlace a pantalla */
+  transform: translateY(0);
+}
+
+/* ========= LAYOUT PRINCIPAL (GRID) ========= */
+/* Contenedor de la aplicación: define el grid base */
+.app {
+  /* Define un grid de 2 filas: topbar y contenido */
+  display: grid;
+  /* Fondo del layout: usa la variable del tema para cubrir toda la pantalla */
+  background: var(--bg);
+  /* Color del texto del layout: asegura texto blanco en modo oscuro */
+  color: var(--text);
+  /* Fila 1: altura fija; fila 2: ocupa el resto */
+  grid-template-rows: var(--topbar-height) 1fr;
+  /* Columnas: sidebar + contenido */
+  grid-template-columns: var(--sidebar-width) 1fr;
+  /* Áreas nombradas para legibilidad */
+  grid-template-areas:
+    "topbar topbar"
+    "sidebar main";
+  /* Altura mínima: llena la pantalla */
+  min-height: 100vh;
+}
+
+/* Barra superior en el área topbar */
+.topbar {
+  /* Asigna el área del grid */
+  grid-area: topbar;
+  /* Usa Flexbox para alinear elementos */
+  display: flex;
+  /* Centra verticalmente */
+  align-items: center;
+  /* Espacia extremos */
+  justify-content: space-between;
+  /* Padding horizontal */
+  padding: 0 var(--space-3);
+  /* Fondo de la barra */
+  background: linear-gradient(90deg, var(--surface-2), rgba(30, 136, 229, 0.25));
+  /* Borde inferior sutil */
+  border-bottom: 1px solid var(--border);
+}
+
+/* Bloque de título en topbar */
+.topbar__title {
+  /* Alinea título y versión en una línea */
+  display: flex;
+  /* Separación entre elementos */
+  gap: 10px;
+  /* Centra verticalmente */
+  align-items: baseline;
+}
+
+/* Texto de marca */
+.brand {
+  /* Peso para destacar */
+  font-weight: 700;
+  /* Tamaño principal */
+  font-size: 16px;
+  /* Espaciado entre letras leve */
+  letter-spacing: 0.3px;
+}
+
+/* Versión en topbar */
+.version {
+  /* Texto secundario */
+  color: var(--text-muted);
+  /* Tamaño menor */
+  font-size: 13px;
+}
+
+/* Zona derecha de acciones */
+.topbar__actions {
+  /* Alinea elementos horizontalmente */
+  display: flex;
+  /* Espacio entre botones */
+  gap: var(--space-2);
+  /* Centra verticalmente */
+  align-items: center;
+}
+
+/* Botón redondo/ícono */
+.icon-button {
+  /* Fondo transparente para integrarse con la barra */
+  background: transparent;
+  /* Borde sutil */
+  border: 1px solid var(--border);
+  /* Color de icono heredado */
+  color: var(--text);
+  /* Tamaño cómodo para touch */
+  width: 40px;
+  /* Tamaño cómodo para touch */
+  height: 40px;
+  /* Forma circular suave */
+  border-radius: 12px;
+  /* Cursor de interacción */
+  cursor: pointer;
+  /* Centra el ícono */
+  display: grid;
+  /* Centra el ícono */
+  place-items: center;
+}
+
+/* Efecto hover: feedback visual */
+.icon-button:hover {
+  /* Fondo de hover */
+  background: var(--hover);
+}
+
+/* Iconos SVG */
+.icon {
+  /* Tamaño estándar */
+  width: 20px;
+  /* Tamaño estándar */
+  height: 20px;
+  /* Trazo visible */
+  stroke: currentColor;
+  /* Grosor del trazo */
+  stroke-width: 2;
+  /* Sin relleno */
+  fill: none;
+  /* Extremos redondeados */
+  stroke-linecap: round;
+  /* Uniones redondeadas */
+  stroke-linejoin: round;
+}
+
+/* Botón tipo píldora (solo UI, deshabilitado) */
+.pill {
+  /* Fondo suave */
+  background: var(--control);
+  /* Borde sutil */
+  border: 1px solid var(--border);
+  /* Texto */
+  color: var(--text-muted);
+  /* Padding para forma de píldora */
+  padding: 8px 12px;
+  /* Bordes redondeados */
+  border-radius: 999px;
+}
+
+/* Sidebar: área de navegación */
+.sidebar {
+  /* Asigna el área del grid */
+  grid-area: sidebar;
+  /* Fondo del panel */
+  background: var(--surface-2);
+  /* Borde derecho separador */
+  border-right: 1px solid var(--border);
+  /* Coloca elementos en columna */
+  display: flex;
+  /* Dirección vertical */
+  flex-direction: column;
+  /* Permite scroll interno si se excede */
+  overflow: auto;
+}
+
+/* Encabezado del sidebar */
+.sidebar__header {
+  /* Padding interno */
+  padding: var(--space-3);
+  /* Borde inferior */
+  border-bottom: 1px solid var(--border);
+}
+
+/* Título del sidebar */
+.sidebar__heading {
+  /* Elimina margen por defecto */
+  margin: 0;
+  /* Tamaño */
+  font-size: 14px;
+  /* Color secundario */
+  color: var(--text-muted);
+  /* Letra en mayúsculas suave */
+  letter-spacing: 0.6px;
+  /* Transforma a mayúsculas */
+  text-transform: uppercase;
+}
+
+/* Navegación del sidebar */
+.nav {
+  /* Padding */
+  padding: var(--space-2);
+}
+
+/* Grupo de navegación (details) */
+.nav__group {
+  /* Elimina borde por defecto de algunos navegadores (inconsistencias) */
+  border: 0;
+}
+
+/* Summary: cabecera del grupo */
+.nav__item {
+  /* Alinea icono + texto */
+  display: flex;
+  /* Centra verticalmente */
+  align-items: center;
+  /* Espaciado entre icono y texto */
+  gap: 10px;
+  /* Padding para área clicable */
+  padding: 12px 12px;
+  /* Bordes redondeados */
+  border-radius: 12px;
+  /* Cursor */
+  cursor: pointer;
+  /* Color base */
+  color: var(--text);
+  /* Evita selección accidental de texto al hacer clic */
+  user-select: none;
+  /* Quita marcador por defecto del summary en algunos navegadores */
+  list-style: none;
+}
+
+/* Quita el triángulo por defecto del summary (Chrome/Safari) */
+.nav__group > summary::-webkit-details-marker {
+  /* Oculta el marcador */
+  display: none;
+}
+
+/* Hover de item */
+.nav__item:hover {
+  /* Fondo de hover */
+  background: var(--hover);
+}
+
+/* Opción principal: acento visual */
+.nav__item--primary {
+  /* Borde sutil */
+  border: 1px solid var(--border);
+  /* Fondo leve */
+  background: rgba(30, 136, 229, 0.12);
+}
+
+/* Etiqueta del item */
+.nav__label {
+  /* Evita salto de línea en colapsado */
+  white-space: nowrap;
+}
+
+/* Lista de subopciones */
+.nav__sublist {
+  /* Elimina bullets */
+  list-style: none;
+  /* Elimina padding por defecto */
+  padding: 8px 0 0 0;
+  /* Elimina margen por defecto */
+  margin: 0;
+}
+
+/* Ítem de sublista */
+.nav__subitem {
+  /* Separación vertical */
+  margin: 6px 0;
+}
+
+/* Botón de subopción (sin navegación ni lógica en v1) */
+.nav__action {
+  /* Ocupa todo el ancho */
+  display: flex;
+  /* Ancho completo */
+  width: 100%;
+  /* Resetea apariencia nativa del botón para estilizarlo con CSS */
+  appearance: none;
+  /* Elimina borde nativo */
+  border: 1px solid transparent;
+  /* Fondo transparente (se agrega en hover) */
+  background: transparent;
+  /* Alinea icono + texto en una misma fila */
+  align-items: center;
+  /* Separación entre icono y texto */
+  gap: 10px;
+  /* Alinea contenido a la izquierda como un elemento de menú */
+  justify-content: flex-start;
+  /* Hereda tipografía para consistencia */
+  font: inherit;
+  /* Padding para área clicable */
+  padding: 10px 12px;
+  /* Bordes redondeados */
+  border-radius: 12px;
+  /* Texto secundario */
+  color: var(--text-muted);
+  /* Cursor de interacción */
+  cursor: pointer;
+}
+
+/* Icono dentro de botones del menú */
+.nav__icon {
+  /* Tamaño ligeramente menor que el icono del header */
+  width: 18px;
+  /* Tamaño ligeramente menor que el icono del header */
+  height: 18px;
+}
+
+/* Texto dentro de botones del menú */
+.nav__text {
+  /* Evita salto de línea cuando el sidebar es estrecho */
+  white-space: nowrap;
+}
+
+/* Hover del botón de subopción */
+.nav__action:hover {
+  /* Fondo hover */
+  background: var(--hover);
+  /* Texto más claro */
+  color: var(--text);
+}
+
+/* Divider del sidebar */
+.sidebar__divider {
+  /* Separación vertical */
+  margin: var(--space-2) var(--space-3);
+  /* Línea */
+  height: 1px;
+  /* Color */
+  background: var(--border);
+}
+
+/* Perfil: empuja al fondo del sidebar */
+.profile {
+  /* Empuja el bloque al final usando margen automático */
+  margin-top: auto;
+  /* Padding */
+  padding: var(--space-3);
+  /* Borde superior */
+  border-top: 1px solid var(--border);
+}
+
+/* Título del perfil */
+.profile__title {
+  /* Elimina margen superior por defecto */
+  margin: 0 0 var(--space-2) 0;
+  /* Tamaño */
+  font-size: 14px;
+  /* Peso */
+  font-weight: 700;
+}
+
+/* Fila del perfil: agrupa controles */
+.profile__row {
+  /* Layout en columna */
+  display: flex;
+  /* Dirección */
+  flex-direction: column;
+  /* Separación */
+  gap: 8px;
+  /* Espacio inferior */
+  margin-top: var(--space-3);
+}
+
+/* Fila centrada: centra elementos del perfil dentro del sidebar */
+.profile__row--center {
+  /* Centra elementos horizontalmente */
+  align-items: center;
+  /* Centra texto asociado a la fila */
+  text-align: center;
+}
+
+/* Centra el texto de vista previa cuando el contenedor está centrado */
+.profile__row--center .profile__preview {
+  /* Centra el bloque */
+  text-align: center;
+}
+
+/* Fila inline (para switch) */
+.profile__row--inline {
+  /* Pone label y switch en una línea */
+  flex-direction: row;
+  /* Alinea verticalmente */
+  align-items: center;
+  /* Justifica extremos */
+  justify-content: space-between;
+}
+
+/* Etiquetas del perfil */
+.profile__label {
+  /* Tamaño */
+  font-size: 13px;
+  /* Color secundario */
+  color: var(--text-muted);
+}
+
+/* Input tipo archivo */
+.profile__file {
+  /* Usa el ancho completo */
+  width: 100%;
+  /* Fondo */
+  background: var(--control);
+  /* Borde */
+  border: 1px solid var(--border);
+  /* Texto */
+  color: var(--text);
+  /* Padding */
+  padding: 10px 12px;
+  /* Bordes redondeados */
+  border-radius: 12px;
+}
+
+/* Input de texto */
+.profile__input {
+  /* Usa el ancho completo */
+  width: 100%;
+  /* Fondo */
+  background: var(--control);
+  /* Borde */
+  border: 1px solid var(--border);
+  /* Texto */
+  color: var(--text);
+  /* Padding */
+  padding: 10px 12px;
+  /* Bordes redondeados */
+  border-radius: 12px;
+}
+
+/* Texto de ayuda */
+.profile__help {
+  /* Elimina margen por defecto */
+  margin: 0;
+  /* Tamaño pequeño */
+  font-size: 12px;
+  /* Color secundario */
+  color: var(--text-muted);
+}
+
+/* Vista previa de nombre */
+.profile__preview {
+  /* Elimina margen por defecto */
+  margin: 0;
+  /* Tamaño pequeño */
+  font-size: 12px;
+  /* Color secundario */
+  color: var(--text-muted);
+}
+
+/* Etiqueta interna de la vista previa */
+.profile__previewLabel {
+  /* Peso */
+  font-weight: 600;
+  /* Color */
+  color: var(--text);
+}
+
+/* Avatar: contenedor para previews */
+.avatar {
+  /* Centra contenido */
+  display: grid;
+  /* Centra contenido */
+  place-items: center;
+  /* Base para posicionar fallback por encima */
+  position: relative;
+  /* Fondo */
+  background: rgba(30, 136, 229, 0.18);
+  /* Borde */
+  border: 1px solid var(--border);
+  /* Sombra */
+  box-shadow: var(--shadow-1);
+  /* Oculta overflow para recortes */
+  overflow: hidden;
+}
+
+/* Avatar circular */
+.avatar--circle {
+  /* Tamaño */
+  width: 56px;
+  /* Tamaño */
+  height: 56px;
+  /* Forma circular */
+  border-radius: 999px;
+}
+
+/* Avatar cuadrado (logo) */
+.avatar--square {
+  /* Ancho */
+  width: 88px;
+  /* Alto */
+  height: 44px;
+  /* Radio */
+  border-radius: 12px;
+}
+
+/* Imagen del avatar */
+.avatar__img {
+  /* Ocupa contenedor */
+  width: 100%;
+  /* Ocupa contenedor */
+  height: 100%;
+  /* Ajusta recorte sin deformar */
+  object-fit: cover;
+  /* Se oculta por defecto (se muestra cuando hay src válido desde JS) */
+  display: none;
+}
+
+/* Texto fallback del avatar */
+.avatar__fallback {
+  /* Ubica el fallback sobre el contenedor */
+  position: absolute;
+  /* Centra el fallback */
+  inset: 0;
+  /* Centra texto */
+  display: grid;
+  /* Centra texto */
+  place-items: center;
+  /* Peso */
+  font-weight: 800;
+  /* Color */
+  color: rgba(255, 255, 255, 0.9);
+  /* Tamaño */
+  font-size: 12px;
+  /* Espaciado de letras */
+  letter-spacing: 0.8px;
+}
+
+/* Avatar clicable: indica interacción para cambiar imagen */
+.avatar--clickable {
+  /* Cursor de interacción */
+  cursor: pointer;
+}
+
+/* Hover del avatar clicable: feedback visual */
+.avatar--clickable:hover {
+  /* Aumenta sutilmente el fondo */
+  background: rgba(30, 136, 229, 0.26);
+}
+
+/* ========= MODAL ========= */
+/* Overlay del modal: cubre toda la pantalla y centra el diálogo */
+.modalOverlay {
+  /* Posiciona encima del layout */
+  position: fixed;
+  /* Cubre toda la pantalla */
+  inset: 0;
+  /* Oscurece fondo (menos “transparente” para mejorar contraste del formulario) */
+  background: rgba(0, 0, 0, 0.86);
+  /* Centra el contenido */
+  display: grid;
+  /* Centra el contenido */
+  place-items: center;
+  /* Capa superior */
+  z-index: 80;
+}
+
+/* Estado oculto del modal: respeta el atributo HTML hidden y evita que el CSS lo “reviva” */
+.modalOverlay[hidden] {
+  /* El overlay no se renderiza ni bloquea interacción */
+  display: none;
+}
+
+/* Modal principal: ocupa toda el área de contenido (excluye sidebar y topbar) */
+.modalOverlay--main {
+  inset: var(--topbar-height) 0 0 var(--sidebar-width);
+  background: transparent;
+  padding: 0;
+  place-items: stretch;
+}
+
+.app.is-collapsed ~ .modalOverlay--main {
+  left: var(--sidebar-width-collapsed);
+}
+
+/* Diálogo del modal */
+.modalDialog {
+  /* Ancho responsivo */
+  width: min(520px, calc(100vw - 32px));
+  /* Fondo del panel */
+  background: var(--surface);
+  /* Borde sutil */
+  border: 1px solid var(--border);
+  /* Bordes redondeados */
+  border-radius: var(--radius);
+  /* Sombra */
+  box-shadow: var(--shadow-1);
+  /* Padding */
+  padding: var(--space-4);
+}
+
+/* Diálogo de formulario: permite más ancho para campos y mantiene centrado */
+.modalDialog--form {
+  /* Un poco más ancho para formularios sin perder responsividad */
+  width: min(760px, calc(100vw - 32px));
+  /* Fondo diferenciado (más claro) respecto al front */
+  background: var(--form-surface);
+}
+
+.modalOverlay--main .modalDialog--form {
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  border-radius: 0;
+  overflow: hidden;
+  color: var(--text);
+}
+
+/* Diálogo de listado: ancho mayor para lectura de registros */
+.modalDialog--list {
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  background: var(--form-surface);
+  border-radius: 0;
+  overflow: hidden;
+  color: var(--text);
+}
+
+/* Barra de herramientas del listado */
+.listToolbar {
+  margin-top: var(--space-3);
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-3);
+}
+
+#listClientsForm {
+  display: flex;
+  flex-direction: column;
+}
+
+#createClientForm {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.createClientBodyContainer {
+  margin-top: var(--space-3);
+  flex: 1;
+  overflow: auto;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: var(--space-2);
+}
+
+#createClientForm .formGrid {
+  margin-top: 0;
+}
+
+#createClientForm .formActions {
+  margin-top: auto;
+  padding-top: var(--space-3);
+}
+
+/* Contenedor con scroll del listado */
+.clientsListContainer {
+  margin-top: var(--space-3);
+  height: min(52vh, 520px);
+  overflow: auto;
+  overflow-x: auto;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: var(--space-2);
+  flex: 1;
+}
+
+.clientsTable {
+  min-width: 980px;
+  display: grid;
+  gap: 10px;
+}
+
+.clientsTable__header,
+.clientsTable__row {
+  display: grid;
+  grid-template-columns: 84px 140px 220px 220px 150px 150px 150px 220px 140px 120px;
+  gap: 10px;
+  align-items: center;
+}
+
+.clientsTable__header {
+  position: sticky;
+  top: 0;
+  background: var(--surface-2);
+  padding: 10px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  font-weight: 700;
+  color: var(--text);
+}
+
+.clientsTable__row {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 10px;
+  color: var(--text);
+  font-size: 13px;
+}
+
+.clientsTable__cell {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.clientsTable__empty {
+  padding: var(--space-3);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--text-muted);
+}
+
+.listFooter {
+  margin-top: var(--space-3);
+  display: flex;
+  justify-content: flex-end;
+  margin-top: auto;
+}
+
+.listCloseButton {
+  width: auto;
+  align-self: flex-end;
+}
+
+/* ========= FORMULARIOS (CREAR CLIENTE) ========= */
+/* Texto de ayuda general del formulario */
+.formHelp {
+  /* Separación inferior */
+  margin: 10px 0 0 0;
+  /* Tamaño cómodo */
+  font-size: 12px;
+  /* Color secundario */
+  color: var(--text-muted);
+  /* Interlineado */
+  line-height: 1.45;
+}
+
+/* Marca de obligatorio: asterisco rojo */
+.requiredMark {
+  /* Color rojo para indicar obligatoriedad */
+  color: #ff5252;
+  /* Peso para visibilidad */
+  font-weight: 800;
+}
+
+/* Grid de formulario: organiza campos en columnas */
+.formGrid {
+  /* Separación superior */
+  margin-top: var(--space-3);
+  /* Layout de grilla */
+  display: grid;
+  /* Dos columnas en pantallas medias y grandes */
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  /* Espaciado */
+  gap: var(--space-3);
+}
+
+/* Campo individual */
+.formField {
+  /* Organización vertical */
+  display: grid;
+  /* Separación de label/control/error */
+  gap: 6px;
+}
+
+/* Campo que ocupa todo el ancho */
+.formField--full {
+  /* Ocupa ambas columnas */
+  grid-column: 1 / -1;
+}
+
+/* Etiqueta del campo */
+.formLabel {
+  /* Tamaño */
+  font-size: 13px;
+  /* Peso */
+  font-weight: 600;
+  /* Color */
+  color: var(--text);
+}
+
+/* Control de texto del formulario */
+.formControl {
+  /* Ancho completo */
+  width: 100%;
+  /* Requisito explícito: fondo blanco y letras negras en entradas del usuario */
+  background: #ffffff;
+  /* Texto negro */
+  color: #000000;
+  /* Borde legible */
+  border: 1px solid rgba(0, 0, 0, 0.25);
+  /* Padding */
+  padding: 10px 12px;
+  /* Bordes redondeados */
+  border-radius: 12px;
+}
+
+/* Placeholder legible en fondo blanco */
+.formControl::placeholder {
+  color: rgba(0, 0, 0, 0.55);
+}
+
+/* Select del formulario: requisito explícito (fondo blanco, letras negras) */
+.formSelect {
+  /* Ancho completo */
+  width: 100%;
+  /* Fondo blanco */
+  background: #ffffff;
+  /* Texto negro */
+  color: #000000;
+  /* Borde legible */
+  border: 1px solid rgba(0, 0, 0, 0.25);
+  /* Padding */
+  padding: 10px 12px;
+  /* Bordes redondeados */
+  border-radius: 12px;
+}
+
+/* Mensaje de error por campo */
+.fieldError {
+  /* Elimina margen por defecto */
+  margin: 0;
+  /* Tamaño pequeño */
+  font-size: 12px;
+  /* Rojo claro visible en ambos temas */
+  color: #ff8a80;
+  /* Asegura espacio mínimo para evitar “saltos” excesivos */
+  min-height: 16px;
+}
+
+/* Acciones del formulario */
+.formActions {
+  /* Separación superior */
+  margin-top: var(--space-3);
+  /* Alineación */
+  display: flex;
+  /* Espacio */
+  gap: var(--space-2);
+  /* Botones al final (como en modal de logout) */
+  justify-content: flex-end;
+}
+
+/* Botones dentro del formulario: no ocupan el 100% por defecto */
+.formActions .button {
+  /* Permite tamaño flexible */
+  width: auto;
+  /* Cada botón ocupa espacio similar */
+  flex: 1;
+}
+
+/* ========= TOAST (MENSAJE TEMPORAL) ========= */
+/* Mensaje flotante para confirmaciones (ej. guardado exitoso) */
+.toast {
+  /* Posicionamiento fijo para que sea visible sin importar scroll */
+  position: fixed;
+  /* Ubicación inferior derecha */
+  right: 16px;
+  /* Ubicación inferior */
+  bottom: 16px;
+  /* Ancho máximo */
+  width: min(420px, calc(100vw - 32px));
+  /* Fondo */
+  background: var(--surface);
+  /* Borde */
+  border: 1px solid var(--border);
+  /* Texto */
+  color: var(--text);
+  /* Bordes */
+  border-radius: 14px;
+  /* Sombra */
+  box-shadow: var(--shadow-1);
+  /* Padding */
+  padding: 12px 14px;
+  /* Capa por encima del contenido */
+  z-index: 90;
+}
+
+/* Respeta hidden y evita que el CSS lo muestre */
+.toast[hidden] {
+  /* No renderiza */
+  display: none;
+}
+
+/* Responsivo: en móvil el formulario pasa a una columna */
+@media (max-width: 720px) {
+  .formGrid {
+    /* Una columna para evitar campos estrechos */
+    grid-template-columns: 1fr;
+  }
+  .formField--full {
+    /* Mantiene comportamiento consistente */
+    grid-column: 1 / -1;
+  }
+
+  .listToolbar {
+    grid-template-columns: 1fr;
+  }
+
+  .modalOverlay--main {
+    left: 0;
+  }
+}
+
+/* Título del modal */
+.modalDialog__title {
+  /* Elimina margen por defecto */
+  margin: 0;
+  /* Tamaño */
+  font-size: 18px;
+  /* Centra el texto del título */
+  text-align: center;
+}
+
+.modalDialog__titleRow {
+  display: flex;
+  gap: 12px;
+  align-items: baseline;
+  justify-content: flex-start;
+}
+
+.modalDialog__titleRow .modalDialog__title {
+  text-align: left;
+}
+
+.modalDialog__counter {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-muted);
+}
+
+/* Texto del modal */
+.modalDialog__text {
+  /* Separación */
+  margin: 10px 0 0 0;
+  /* Color secundario */
+  color: var(--text-muted);
+  /* Interlineado */
+  line-height: 1.5;
+  /* Centra el texto del mensaje */
+  text-align: center;
+}
+
+/* Acciones del modal */
+.modalDialog__actions {
+  /* Separación superior */
+  margin-top: var(--space-3);
+  /* Alineación en fila */
+  display: flex;
+  /* Espaciado */
+  gap: var(--space-2);
+  /* Justifica a la derecha */
+  justify-content: flex-end;
+}
+
+/* Estado de la página cuando hay modal: evita scroll del fondo */
+body.modal-open {
+  /* Bloquea scroll */
+  overflow: hidden;
+}
+
+/* Switch accesible */
+.switch {
+  /* Hace clicable el control completo */
+  cursor: pointer;
+  /* Alinea dentro del flujo */
+  display: inline-flex;
+}
+
+/* Oculta el checkbox visualmente pero lo mantiene accesible */
+.switch input {
+  /* Quita apariencia nativa */
+  appearance: none;
+  /* Ancho mínimo */
+  width: 0;
+  /* Alto mínimo */
+  height: 0;
+  /* Margen */
+  margin: 0;
+}
+
+/* Track del switch */
+.switch__track {
+  /* Dimensiones */
+  width: 48px;
+  /* Dimensiones */
+  height: 28px;
+  /* Fondo */
+  background: var(--control);
+  /* Borde */
+  border: 1px solid var(--border);
+  /* Radio */
+  border-radius: 999px;
+  /* Posicionamiento para el knob */
+  position: relative;
+  /* Transición */
+  transition: background var(--motion-fast) ease, border-color var(--motion-fast) ease;
+}
+
+/* Knob del switch */
+.switch__track::after {
+  /* Contenido vacío (necesario para pseudo-elemento) */
+  content: "";
+  /* Tamaño */
+  width: 22px;
+  /* Tamaño */
+  height: 22px;
+  /* Fondo */
+  background: var(--text);
+  /* Posición */
+  position: absolute;
+  /* Distancia superior */
+  top: 50%;
+  /* Distancia izquierda */
+  left: 3px;
+  /* Centra vertical */
+  transform: translateY(-50%);
+  /* Radio circular */
+  border-radius: 999px;
+  /* Transición de movimiento */
+  transition: transform var(--motion-fast) ease, background var(--motion-fast) ease;
+}
+
+/* Estado activado: usa el selector de estado del input hermano */
+.switch input:checked + .switch__track {
+  /* Fondo azul */
+  background: rgba(30, 136, 229, 0.25);
+  /* Borde más visible */
+  border-color: rgba(30, 136, 229, 0.55);
+}
+
+/* Estado activado: mueve el knob */
+.switch input:checked + .switch__track::after {
+  /* Traslada el knob a la derecha */
+  transform: translate(20px, -50%);
+}
+
+/* Botón genérico */
+.button {
+  /* Ancho completo */
+  width: 100%;
+  /* Padding */
+  padding: 10px 12px;
+  /* Borde */
+  border: 1px solid var(--border);
+  /* Fondo */
+  background: var(--control);
+  /* Texto */
+  color: var(--text);
+  /* Bordes redondeados */
+  border-radius: 12px;
+  /* Centra el texto del botón */
+  text-align: center;
+  /* Cursor */
+  cursor: pointer;
+}
+
+/* Hover del botón */
+.button:hover {
+  /* Fondo hover */
+  background: var(--hover);
+}
+
+/* Estado deshabilitado: requisito (Guardar debe verse deshabilitado cuando no está completo) */
+.button:disabled,
+.button[disabled] {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+/* Variante de peligro */
+.button--danger {
+  /* Borde con color de peligro */
+  border-color: #c62828;
+  background: #c62828;
+  color: #ffffff;
+}
+
+/* Variante de éxito: botón Guardar (verde) */
+.button--success {
+  border-color: #2e7d32;
+  background: #2e7d32;
+  color: #ffffff;
+}
+
+/* Asegura contraste aun en deshabilitado */
+.button--success:disabled,
+.button--success[disabled] {
+  background: #1b5e20;
+  border-color: #1b5e20;
+}
+
+/* ========= CONTENIDO PRINCIPAL ========= */
+/* Área main del grid */
+.main {
+  /* Asigna área */
+  grid-area: main;
+  /* Padding */
+  padding: var(--space-4);
+  /* Permite scroll si se requiere */
+  overflow: auto;
+}
+
+/* Encabezado de página */
+.pageHeader {
+  /* Fondo de superficie */
+  background: var(--surface);
+  /* Borde */
+  border: 1px solid var(--border);
+  /* Radio */
+  border-radius: var(--radius);
+  /* Padding */
+  padding: var(--space-4);
+  /* Sombra */
+  box-shadow: var(--shadow-1);
+}
+
+/* Título principal */
+.pageHeader__title {
+  /* Elimina margen por defecto */
+  margin: 0;
+  /* Tamaño */
+  font-size: 24px;
+}
+
+/* Subtítulo */
+.pageHeader__subtitle {
+  /* Margen superior */
+  margin: 6px 0 0 0;
+  /* Color */
+  color: var(--text-muted);
+}
+
+/* Contenedor de tarjetas con grid responsivo */
+.cards {
+  /* Margen superior */
+  margin-top: var(--space-4);
+  /* Grid para tarjetas */
+  display: grid;
+  /* Columnas fluidas: mínimo 240px, máximo 1fr */
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  /* Espaciado */
+  gap: var(--space-3);
+}
+
+/* Tarjeta */
+.card {
+  /* Fondo */
+  background: var(--surface);
+  /* Borde */
+  border: 1px solid var(--border);
+  /* Radio */
+  border-radius: var(--radius);
+  /* Padding */
+  padding: var(--space-4);
+  /* Sombra */
+  box-shadow: var(--shadow-1);
+}
+
+/* Variante acentuada */
+.card--accent {
+  /* Gradiente azul para resaltar */
+  background: linear-gradient(135deg, rgba(30, 136, 229, 0.22), var(--surface));
+}
+
+/* Título de tarjeta */
+.card__title {
+  /* Elimina margen */
+  margin: 0 0 8px 0;
+  /* Tamaño */
+  font-size: 16px;
+}
+
+/* Texto de tarjeta */
+.card__text {
+  /* Elimina margen */
+  margin: 0;
+  /* Color secundario */
+  color: var(--text-muted);
+  /* Interlineado para lectura */
+  line-height: 1.5;
+}
+
+/* ========= OVERLAY (MÓVIL) ========= */
+/* Capa para oscurecer cuando el sidebar está abierto en móvil */
+.overlay {
+  /* Posiciona sobre toda la pantalla */
+  position: fixed;
+  /* Arriba */
+  inset: 0;
+  /* Color semitransparente */
+  background: rgba(0, 0, 0, 0.45);
+  /* Por encima del contenido */
+  z-index: 20;
+}
+
+/* ========= SIDEBAR COLAPSADO (ESCRITORIO) ========= */
+/* Estado colapsado: aplicado con la clase .is-collapsed en .app desde JS */
+.app.is-collapsed {
+  /* Reduce el ancho del sidebar */
+  grid-template-columns: var(--sidebar-width-collapsed) 1fr;
+}
+
+/* Oculta etiquetas cuando está colapsado */
+.app.is-collapsed .nav__label {
+  /* Oculta texto */
+  display: none;
+}
+
+/* Centra el item principal cuando el sidebar está colapsado (solo icono visible) */
+.app.is-collapsed .nav__item {
+  /* Centra contenido dentro del botón summary */
+  justify-content: center;
+}
+
+/* Ajusta padding del submenú cuando está colapsado (se mantiene, pero se comprime visualmente) */
+.app.is-collapsed .nav__action {
+  /* Centra el icono cuando no hay texto */
+  justify-content: center;
+  /* Padding simétrico para mantener el botón compacto */
+  padding: 10px 12px;
+}
+
+/* Oculta el texto de subopciones cuando el sidebar está colapsado */
+.app.is-collapsed .nav__text {
+  /* Oculta el texto dejando solo icono */
+  display: none;
+}
+
+/* Reduce el header del sidebar en colapsado */
+.app.is-collapsed .sidebar__header {
+  /* Menos padding */
+  padding: var(--space-2);
+}
+
+/* Ajusta el perfil para que no desborde cuando el sidebar está colapsado */
+.app.is-collapsed .profile {
+  /* Reduce padding para ajustarse al ancho */
+  padding: var(--space-2);
+}
+
+/* Oculta el título del perfil para evitar desbordes en colapsado */
+.app.is-collapsed .profile__title {
+  /* Se oculta en vista contraída */
+  display: none;
+}
+
+/* Reduce separación vertical del perfil en colapsado */
+.app.is-collapsed .profile__row {
+  /* Menor margen superior */
+  margin-top: var(--space-2);
+}
+
+/* Oculta el texto "Usuario: ..." en colapsado para evitar que se corte */
+.app.is-collapsed .profile__preview {
+  /* Se oculta en vista contraída */
+  display: none;
+}
+
+/* Reduce el tamaño de los avatares en colapsado */
+.app.is-collapsed .avatar--circle {
+  /* Tamaño más compacto */
+  width: 46px;
+  /* Tamaño más compacto */
+  height: 46px;
+}
+
+/* ========= RESPONSIVE (MEDIA QUERIES) ========= */
+/* Pantallas pequeñas: sidebar off-canvas para ahorrar espacio */
+@media (max-width: 860px) {
+  /* El grid pasa a una sola columna para contenido */
+  .app {
+    /* Una sola columna */
+    grid-template-columns: 1fr;
+    /* Topbar y main */
+    grid-template-areas:
+      "topbar"
+      "main";
+  }
+
+  /* El sidebar se saca del flujo y se convierte en panel flotante */
+  .sidebar {
+    /* Posiciona fijo */
+    position: fixed;
+    /* Desde arriba */
+    top: var(--topbar-height);
+    /* Desde la izquierda */
+    left: 0;
+    /* Alto restante */
+    height: calc(100vh - var(--topbar-height));
+    /* Ancho */
+    width: var(--sidebar-width);
+    /* Z-index sobre contenido */
+    z-index: 30;
+    /* Transición de entrada/salida */
+    transition: transform var(--motion-fast) ease;
+    /* Estado cerrado por defecto en móvil (lo controla JS con .is-open) */
+    transform: translateX(-110%);
+  }
+
+  /* Cuando está abierto en móvil */
+  .app.is-open .sidebar {
+    /* Muestra el panel */
+    transform: translateX(0);
+  }
+
+  /* El overlay se muestra cuando el menú está abierto */
+  .app.is-open .overlay {
+    /* Asegura visibilidad */
+    display: block;
+  }
+
+  /* El main ocupa el área principal con padding más pequeño */
+  .main {
+    /* Reduce padding */
+    padding: var(--space-3);
+  }
+}
+
+/* Respeta preferencia del usuario para reducir animaciones */
+@media (prefers-reduced-motion: reduce) {
+  /* Desactiva transiciones globales */
+  * {
+    /* Sin transición */
+    transition: none !important;
+  }
+
+  /* Desactiva scroll suave */
+  html {
+    /* Scroll instantáneo */
+    scroll-behavior: auto;
+  }
+}

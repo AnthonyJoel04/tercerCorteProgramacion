@@ -1,0 +1,1030 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mascotas - Sistema de Adopción</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@400;500;600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #F7F4EF;
+    --surface: #FFFFFF;
+    --surface2: #F0EDE6;
+    --border: #E2DDD4;
+    --border2: #C8C2B6;
+    --text: #1C1A16;
+    --text2: #6B6558;
+    --text3: #9C9589;
+    --accent: #2D6A4F;
+    --accent2: #40916C;
+    --accent-light: #D8F3DC;
+    --danger: #C1392B;
+    --danger-light: #FDECEA;
+    --warn: #B5571A;
+    --warn-light: #FEF0E6;
+    --info: #1A5276;
+    --info-light: #EBF5FB;
+    --radius: 10px;
+    --radius-lg: 14px;
+    --shadow: 0 1px 4px rgba(0,0,0,0.07);
+    --shadow-md: 0 4px 16px rgba(0,0,0,0.10);
+  }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    font-size: 15px;
+    line-height: 1.6;
+  }
+
+  /* LAYOUT */
+  .app { display: flex; min-height: 100vh; }
+
+  /* SIDEBAR */
+  .sidebar {
+    width: 240px;
+    min-width: 240px;
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow-y: auto;
+  }
+
+  .sidebar-logo {
+    padding: 24px 20px 20px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .logo-mark {
+    font-family: 'Fraunces', serif;
+    font-size: 22px;
+    font-weight: 600;
+    color: var(--accent);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .logo-sub {
+    font-size: 11px;
+    color: var(--text3);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    margin-top: 2px;
+  }
+
+  .nav { padding: 12px 10px; flex: 1; }
+
+  .nav-section-label {
+    font-size: 10px;
+    color: var(--text3);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 8px 10px 4px;
+    font-weight: 500;
+  }
+
+  .nav-btn {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    padding: 9px 10px;
+    border: none;
+    background: transparent;
+    border-radius: var(--radius);
+    cursor: pointer;
+    font-size: 14px;
+    color: var(--text2);
+    font-family: 'DM Sans', sans-serif;
+    transition: background 0.15s, color 0.15s;
+    text-align: left;
+  }
+
+  .nav-btn:hover { background: var(--surface2); color: var(--text); }
+
+  .nav-btn.active {
+    background: var(--accent-light);
+    color: var(--accent);
+    font-weight: 500;
+  }
+
+  .nav-btn svg { width: 17px; height: 17px; flex-shrink: 0; }
+
+  .badge-count {
+    margin-left: auto;
+    background: var(--accent);
+    color: #fff;
+    font-size: 11px;
+    font-weight: 500;
+    padding: 1px 7px;
+    border-radius: 20px;
+    min-width: 20px;
+    text-align: center;
+  }
+
+  /* MAIN */
+  .main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  .topbar {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 16px 28px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+
+  .topbar h1 {
+    font-family: 'Fraunces', serif;
+    font-size: 20px;
+    font-weight: 500;
+    color: var(--text);
+  }
+
+  .topbar-actions { display: flex; gap: 10px; align-items: center; }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 16px;
+    border-radius: var(--radius);
+    font-size: 13.5px;
+    font-weight: 500;
+    font-family: 'DM Sans', sans-serif;
+    cursor: pointer;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--text);
+    transition: background 0.15s;
+  }
+  .btn:hover { background: var(--surface2); }
+  .btn-primary { background: var(--accent); color: #fff; border-color: var(--accent); }
+  .btn-primary:hover { background: var(--accent2); border-color: var(--accent2); }
+  .btn-danger { background: var(--danger-light); color: var(--danger); border-color: #FACACC; }
+  .btn-danger:hover { background: #fbd8d7; }
+  .btn svg { width: 15px; height: 15px; }
+
+  .content { padding: 28px; overflow-y: auto; flex: 1; }
+
+  /* SECTIONS */
+  .section { display: none; }
+  .section.active { display: block; }
+
+  /* STATS ROW */
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 14px;
+    margin-bottom: 28px;
+  }
+
+  .stat-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 18px 20px;
+  }
+
+  .stat-label { font-size: 12px; color: var(--text3); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 6px; }
+  .stat-value { font-family: 'Fraunces', serif; font-size: 30px; font-weight: 600; color: var(--text); }
+  .stat-sub { font-size: 12px; color: var(--text3); margin-top: 3px; }
+  .stat-card.accent-card { background: var(--accent); }
+  .stat-card.accent-card .stat-label, .stat-card.accent-card .stat-sub { color: rgba(255,255,255,0.65); }
+  .stat-card.accent-card .stat-value { color: #fff; }
+
+  /* CARD */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+  }
+
+  .card-header {
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+
+  .card-title {
+    font-family: 'Fraunces', serif;
+    font-size: 16px;
+    font-weight: 500;
+  }
+
+  .card-body { padding: 20px; }
+
+  /* TABLE */
+  .table-wrap { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  thead th {
+    text-align: left;
+    padding: 10px 14px;
+    font-size: 11.5px;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    color: var(--text3);
+    font-weight: 500;
+    background: var(--surface2);
+    border-bottom: 1px solid var(--border);
+  }
+  tbody tr { border-bottom: 1px solid var(--border); }
+  tbody tr:last-child { border-bottom: none; }
+  tbody tr:hover { background: var(--bg); }
+  tbody td { padding: 11px 14px; color: var(--text); vertical-align: middle; }
+
+  .avatar {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: 500;
+    flex-shrink: 0;
+  }
+
+  .avatar-green { background: var(--accent-light); color: var(--accent); }
+  .avatar-blue  { background: var(--info-light); color: var(--info); }
+  .avatar-amber { background: var(--warn-light); color: var(--warn); }
+  .avatar-red   { background: var(--danger-light); color: var(--danger); }
+
+  .pill {
+    display: inline-flex;
+    align-items: center;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 500;
+    white-space: nowrap;
+  }
+
+  .pill-green  { background: var(--accent-light); color: var(--accent); }
+  .pill-blue   { background: var(--info-light); color: var(--info); }
+  .pill-amber  { background: var(--warn-light); color: var(--warn); }
+  .pill-red    { background: var(--danger-light); color: var(--danger); }
+  .pill-gray   { background: var(--surface2); color: var(--text2); }
+
+  /* FORM */
+  .form-row { display: grid; gap: 14px; margin-bottom: 14px; }
+  .form-row-2 { grid-template-columns: 1fr 1fr; }
+  .form-row-3 { grid-template-columns: 1fr 1fr 1fr; }
+  label { font-size: 13px; color: var(--text2); font-weight: 500; display: block; margin-bottom: 5px; }
+  input, select, textarea {
+    width: 100%;
+    padding: 9px 12px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    color: var(--text);
+    background: var(--surface);
+    outline: none;
+    transition: border-color 0.15s;
+  }
+  input:focus, select:focus, textarea:focus { border-color: var(--accent2); }
+  textarea { resize: vertical; min-height: 80px; }
+
+  /* MODAL */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(28,26,22,0.45);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.18s;
+  }
+  .modal-overlay.open { opacity: 1; pointer-events: all; }
+.modal {
+    background: var(--surface);
+    border-radius: var(--radius-lg);
+    width: 520px;
+    max-width: 95vw;
+    max-height: 85vh;
+    overflow-y: auto;
+    box-shadow: var(--shadow-md);
+  }
+  @keyframes modalSlideIn {
+    from { opacity: 0; transform: translateY(28px) scale(0.97); }
+    to   { opacity: 1; transform: translateY(0)    scale(1);    }
+  }
+  @keyframes fieldReveal {
+    from { opacity: 0; transform: translateY(10px); }
+    to   { opacity: 1; transform: translateY(0);    }
+  }
+  .modal-overlay.open .modal {
+    animation: modalSlideIn 300ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+  .modal-overlay.open .form-row:nth-child(1) { animation: fieldReveal 260ms ease 60ms  both; }
+  .modal-overlay.open .form-row:nth-child(2) { animation: fieldReveal 260ms ease 120ms both; }
+  .modal-overlay.open .form-row:nth-child(3) { animation: fieldReveal 260ms ease 180ms both; }
+  .modal-overlay.open .form-row:nth-child(4) { animation: fieldReveal 260ms ease 240ms both; }
+  .modal-overlay.open .modal-footer          { animation: fieldReveal 260ms ease 280ms both; }
+  .modal-footer .btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 14px rgba(0,0,0,0.12);
+    transition: transform 0.12s, box-shadow 0.15s;
+  }
+  .modal-header {
+    padding: 20px 24px 16px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .modal-title { font-family: 'Fraunces', serif; font-size: 18px; font-weight: 500; }
+  .modal-body { padding: 24px; }
+  .modal-footer {
+    padding: 16px 24px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+  }
+  .close-btn {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    color: var(--text3);
+    padding: 4px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+  }
+  .close-btn:hover { background: var(--surface2); color: var(--text); }
+
+  /* PET GRID */
+  .pets-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 16px;
+  }
+
+  .pet-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    transition: box-shadow 0.15s;
+  }
+  .pet-card:hover { box-shadow: var(--shadow-md); }
+
+  .pet-card-img {
+    height: 120px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 52px;
+    background: var(--surface2);
+  }
+
+  .pet-card-body { padding: 14px; }
+  .pet-name { font-family: 'Fraunces', serif; font-size: 16px; font-weight: 500; margin-bottom: 2px; }
+  .pet-meta { font-size: 12px; color: var(--text3); margin-bottom: 10px; }
+
+  /* SEARCH */
+  .search-bar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 8px 12px;
+    font-size: 14px;
+    color: var(--text2);
+  }
+  .search-bar input {
+    border: none;
+    padding: 0;
+    font-size: 14px;
+    background: transparent;
+    outline: none;
+    width: 180px;
+  }
+
+  /* FILE UPLOAD */
+  .file-drop {
+    border: 2px dashed var(--border2);
+    border-radius: var(--radius-lg);
+    padding: 36px 24px;
+    text-align: center;
+    cursor: pointer;
+    background: var(--surface2);
+    transition: border-color 0.15s, background 0.15s;
+  }
+  .file-drop:hover { border-color: var(--accent2); background: var(--accent-light); }
+  .file-drop.dragover { border-color: var(--accent); background: var(--accent-light); }
+  .file-icon { font-size: 36px; margin-bottom: 10px; }
+  .file-hint { font-size: 13px; color: var(--text3); margin-top: 6px; }
+
+  .file-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 14px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    margin-top: 10px;
+    background: var(--surface);
+  }
+  .file-item-icon { font-size: 24px; }
+  .file-item-info { flex: 1; min-width: 0; }
+  .file-item-name { font-size: 13.5px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .file-item-size { font-size: 12px; color: var(--text3); }
+
+  /* CHART BAR */
+  .chart-bars { display: flex; gap: 8px; align-items: flex-end; height: 140px; margin-top: 12px; }
+  .bar-wrap { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; height: 100%; justify-content: flex-end; }
+  .bar {
+    width: 100%;
+    background: var(--accent);
+    border-radius: 4px 4px 0 0;
+    min-height: 4px;
+    transition: height 0.3s;
+  }
+  .bar-label { font-size: 11px; color: var(--text3); }
+  .bar-value { font-size: 11px; font-weight: 500; color: var(--text2); }
+
+  /* VISIT */
+  .visit-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .visit-item:last-child { border-bottom: none; }
+  .visit-date-box {
+    width: 48px;
+    height: 52px;
+    background: var(--accent-light);
+    border-radius: var(--radius);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .visit-day { font-family: 'Fraunces', serif; font-size: 20px; font-weight: 600; color: var(--accent); line-height: 1; }
+  .visit-month { font-size: 10px; text-transform: uppercase; letter-spacing: 0.07em; color: var(--accent2); }
+
+  /* DASHBOARD */
+  .dash-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  .section-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+  .section-head h2 { font-family: 'Fraunces', serif; font-size: 20px; font-weight: 500; }
+
+  /* TOAST */
+  .toast {
+    position: fixed;
+    bottom: 28px;
+    right: 28px;
+    background: var(--text);
+    color: #fff;
+    padding: 12px 18px;
+    border-radius: var(--radius);
+    font-size: 13.5px;
+    z-index: 200;
+    opacity: 0;
+    transform: translateY(12px);
+    transition: opacity 0.2s, transform 0.2s;
+    pointer-events: none;
+    max-width: 300px;
+  }
+  .toast.show { opacity: 1; transform: translateY(0); }
+
+  /* ── ANIMACIONES DE ENTRADA PARA MODALES ── */
+  @keyframes modalSlideIn {
+    from { opacity: 0; transform: translateY(24px) scale(0.98); }
+    to   { opacity: 1; transform: translateY(0)    scale(1);    }
+  }
+  @keyframes fieldReveal {
+    from { opacity: 0; transform: translateY(10px); }
+    to   { opacity: 1; transform: translateY(0);    }
+  }
+
+  .modal-overlay.open .modal {
+    animation: modalSlideIn 280ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+  .modal-overlay.open .form-row:nth-child(1) { animation: fieldReveal 240ms ease 60ms  both; }
+  .modal-overlay.open .form-row:nth-child(2) { animation: fieldReveal 240ms ease 110ms both; }
+  .modal-overlay.open .form-row:nth-child(3) { animation: fieldReveal 240ms ease 160ms both; }
+  .modal-overlay.open .form-row:nth-child(4) { animation: fieldReveal 240ms ease 210ms both; }
+  .modal-overlay.open .modal-footer          { animation: fieldReveal 240ms ease 250ms both; }
+
+  .modal input:focus,
+  .modal select:focus,
+  .modal textarea:focus {
+    transform: scale(1.01);
+    transition: border-color 0.15s, transform 0.12s, box-shadow 0.15s;
+    box-shadow: 0 0 0 3px rgba(64,145,108,0.15);
+  }
+  .modal-footer .btn {
+    transition: background 0.15s, transform 0.12s, box-shadow 0.15s;
+  }
+  .modal-footer .btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 14px rgba(0,0,0,0.12);
+  }
+    
+  /* FILTER ROW */
+  .filter-row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+
+  .empty-state { text-align: center; padding: 40px 20px; color: var(--text3); }
+  .empty-icon { font-size: 40px; margin-bottom: 10px; }
+
+  /* RESPONSIVE */
+  @media (max-width: 900px) {
+    .stats-grid { grid-template-columns: 1fr 1fr; }
+    .dash-grid { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 680px) {
+    .sidebar { width: 200px; min-width: 200px; }
+    .stats-grid { grid-template-columns: 1fr 1fr; }
+    .form-row-2, .form-row-3 { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+<div class="app">
+
+
+  <div id="menuPrincipalMount"></div>
+  
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-mark">🐾 Adopción de Mascotas</div>
+    <div class="logo-sub">Sistema de Adopción</div>
+  </div>
+  <nav class="nav">
+    <div class="nav-section-label">Principal</div>
+    <button class="nav-btn active" onclick="navigate('dashboard', this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+      Resumen
+    </button>
+    <button class="nav-btn" onclick="navigate('mascotas', this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M10 5.172C10 3.782 8.423 2.679 6.5 3c-2.823.47-4.113 6.006-4 7 .08.703 1.725 1.722 3.656 1 1.261-.472 1.96-1.45 2.344-2.5M14.267 5.172c0-1.39 1.577-2.493 3.5-2.172 2.823.47 4.113 6.006 4 7-.08.703-1.725 1.722-3.656 1-1.261-.472-1.855-1.45-2.344-2.5M8 14v.5A3.5 3.5 0 0011.5 18h1a3.5 3.5 0 003.5-3.5V14"/><path d="M5 14h14"/></svg>
+      Mascotas
+      <span class="badge-count" id="badge-mascotas">0</span>
+    </button>
+    <button class="nav-btn" onclick="navigate('clientes', this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
+      Clientes
+      <span class="badge-count" id="badge-clientes">0</span>
+    </button>
+    <button class="nav-btn" onclick="navigate('adopciones', this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>
+      Adopciones
+      <span class="badge-count" id="badge-adopciones">0</span>
+    </button>
+    <div class="nav-section-label" style="margin-top:10px">Gestión</div>
+    <button class="nav-btn" onclick="navigate('visitas', this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+      Visitas
+      <span class="badge-count" id="badge-visitas">0</span>
+    </button>
+    <button class="nav-btn" onclick="navigate('documentos', this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14,2 14,8 20,8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+      Documentos
+    </button>
+    <button class="nav-btn" onclick="navigate('estadisticas', this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+      Estadísticas
+    </button>
+  </nav>
+</aside>
+
+<!-- MAIN -->
+<div class="main">
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <h1 id="page-title">Resumen</h1>
+    <div class="topbar-actions">
+      <div class="search-bar">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+        <input type="text" id="global-search" placeholder="Buscar..." oninput="globalSearch(this.value)">
+      </div>
+      <button class="btn btn-primary" id="main-add-btn" onclick="openAddModal()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Agregar
+      </button>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <!-- ===== DASHBOARD ===== -->
+    <section class="section active" id="sec-dashboard">
+      <div class="stats-grid">
+        <div class="stat-card accent-card">
+          <div class="stat-label">Mascotas disponibles</div>
+          <div class="stat-value" id="s-disponibles">0</div>
+          <div class="stat-sub">En refugio</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Clientes registrados</div>
+          <div class="stat-value" id="s-clientes">0</div>
+          <div class="stat-sub">Potenciales adoptantes</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Adopciones totales</div>
+          <div class="stat-value" id="s-adopciones">0</div>
+          <div class="stat-sub">Completadas</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Visitas agendadas</div>
+          <div class="stat-value" id="s-visitas">0</div>
+          <div class="stat-sub">Próximas / pendientes</div>
+        </div>
+      </div>
+      <div class="dash-grid">
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">Últimas adopciones</span>
+            <button class="btn" onclick="navigate('adopciones', document.querySelector('[onclick*=adopciones]'))">Ver todas</button>
+          </div>
+          <div class="card-body" style="padding:0">
+            <div class="table-wrap">
+              <table>
+                <thead><tr><th>Mascota</th><th>Cliente</th><th>Fecha</th><th>Estado</th></tr></thead>
+                <tbody id="dash-adopciones-tbody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header"><span class="card-title">Próximas visitas</span></div>
+          <div class="card-body" id="dash-visitas-list" style="padding:12px 16px"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== MASCOTAS ===== -->
+    <section class="section" id="sec-mascotas">
+      <div class="section-head">
+        <div class="filter-row">
+          <select id="filter-especie" onchange="renderMascotas()" style="width:auto;padding:8px 12px">
+            <option value="">Todas las especies</option>
+            <option>Perro</option><option>Gato</option><option>Conejo</option><option>Ave</option><option>Otro</option>
+          </select>
+          <select id="filter-estado" onchange="renderMascotas()" style="width:auto;padding:8px 12px">
+            <option value="">Todos los estados</option>
+            <option>Disponible</option><option>Adoptado</option><option>En proceso</option>
+          </select>
+        </div>
+      </div>
+      <div class="pets-grid" id="pets-grid"></div>
+    </section>
+
+    <!-- ===== CLIENTES ===== -->
+    <section class="section" id="sec-clientes">
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">Lista de clientes</span>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Nombre</th><th>Email</th><th>Teléfono</th><th>Ciudad</th><th>Mascotas adoptadas</th><th>Acciones</th></tr></thead>
+            <tbody id="clientes-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== ADOPCIONES ===== -->
+    <section class="section" id="sec-adopciones">
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">Registro de adopciones</span>
+          <div class="filter-row">
+            <select id="filter-estado-adop" onchange="renderAdopciones()" style="width:auto;padding:8px 12px">
+              <option value="">Todos</option><option>Aprobada</option><option>Pendiente</option><option>Rechazada</option>
+            </select>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>ID</th><th>Mascota</th><th>Cliente</th><th>Fecha</th><th>Estado</th><th>Notas</th><th>Acciones</th></tr></thead>
+            <tbody id="adopciones-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== VISITAS ===== -->
+    <section class="section" id="sec-visitas">
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">Visitas agendadas</span>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Fecha</th><th>Hora</th><th>Cliente</th><th>Mascota</th><th>Motivo</th><th>Estado</th><th>Acciones</th></tr></thead>
+            <tbody id="visitas-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== DOCUMENTOS ===== -->
+    <section class="section" id="sec-documentos">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+        <div class="card">
+          <div class="card-header"><span class="card-title">Subir documentos</span></div>
+          <div class="card-body">
+            <div class="form-row" style="margin-bottom:14px">
+              <div>
+                <label>Cliente asociado</label>
+                <select id="doc-cliente"><option value="">Seleccionar cliente...</option></select>
+              </div>
+              <div>
+                <label>Tipo de documento</label>
+                <select id="doc-tipo">
+                  <option value="">Seleccionar...</option>
+                  <option>Contrato de adopción</option>
+                  <option>Identificación</option>
+                  <option>Comprobante de domicilio</option>
+                  <option>Historial veterinario</option>
+                  <option>Otro</option>
+                </select>
+              </div>
+            </div>
+            <div class="file-drop" id="file-drop" onclick="document.getElementById('file-input').click()" ondragover="ev.preventDefault();this.classList.add('dragover')" ondragleave="this.classList.remove('dragover')" ondrop="handleFileDrop(event)">
+              <div class="file-icon">📎</div>
+              <div style="font-size:14px;font-weight:500;color:var(--text2)">Arrastra archivos aquí o haz clic para seleccionar</div>
+              <div class="file-hint">PDF, JPG, PNG · Máx 10 MB por archivo</div>
+            </div>
+            <input type="file" id="file-input" style="display:none" multiple accept=".pdf,.jpg,.jpeg,.png" onchange="handleFileSelect(this.files)">
+            <div id="file-preview"></div>
+            <div style="margin-top:16px;display:flex;justify-content:flex-end">
+              <button class="btn btn-primary" onclick="saveDocuments()">Guardar documentos</button>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header"><span class="card-title">Documentos guardados</span></div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Archivo</th><th>Tipo</th><th>Cliente</th><th>Fecha</th><th></th></tr></thead>
+              <tbody id="docs-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== ESTADÍSTICAS ===== -->
+    <section class="section" id="sec-estadisticas">
+      <div class="stats-grid" style="margin-bottom:24px">
+        <div class="stat-card">
+          <div class="stat-label">Tasa de adopción</div>
+          <div class="stat-value" id="est-tasa">0%</div>
+          <div class="stat-sub">Adoptados / Total</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Mascotas disponibles</div>
+          <div class="stat-value" id="est-disponibles">0</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Tiempo prom. en refugio</div>
+          <div class="stat-value" id="est-tiempo">—</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Documentos subidos</div>
+          <div class="stat-value" id="est-docs">0</div>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+        <div class="card">
+          <div class="card-header"><span class="card-title">Adopciones por mes</span></div>
+          <div class="card-body">
+            <div class="chart-bars" id="chart-meses"></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header"><span class="card-title">Mascotas por especie</span></div>
+          <div class="card-body" id="chart-especies"></div>
+        </div>
+        <div class="card">
+          <div class="card-header"><span class="card-title">Distribución por estado</span></div>
+          <div class="card-body" id="chart-estados"></div>
+        </div>
+        <div class="card">
+          <div class="card-header"><span class="card-title">Visitas por mes</span></div>
+          <div class="card-body">
+            <div class="chart-bars" id="chart-visitas-mes"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </div><!-- /content -->
+</div><!-- /main -->
+</div><!-- /app -->
+
+<!-- ============================================================
+     MODALS
+============================================================ -->
+
+<!-- MASCOTA MODAL -->
+<div class="modal-overlay" id="modal-mascota">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title" id="modal-mascota-title">Nueva mascota</span>
+      <button class="close-btn" onclick="closeModal('modal-mascota')">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="m-id">
+      <div class="form-row form-row-2">
+        <div><label>Nombre *</label><input id="m-nombre" placeholder="Ej. Firulais"></div>
+        <div><label>Especie *</label>
+          <select id="m-especie">
+            <option value="">Seleccionar...</option>
+            <option>Perro</option><option>Gato</option><option>Conejo</option><option>Ave</option><option>Otro</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row form-row-3">
+        <div><label>Raza</label><input id="m-raza" placeholder="Labrador..."></div>
+        <div><label>Edad</label><input id="m-edad" placeholder="2 años"></div>
+        <div><label>Sexo</label>
+          <select id="m-sexo"><option value="">—</option><option>Macho</option><option>Hembra</option></select>
+        </div>
+      </div>
+      <div class="form-row form-row-2">
+        <div><label>Estado</label>
+          <select id="m-estado"><option>Disponible</option><option>En proceso</option><option>Adoptado</option></select>
+        </div>
+        <div><label>Emoji / ícono</label><input id="m-emoji" placeholder="🐶 🐱 🐰 🐦"></div>
+      </div>
+      <div class="form-row">
+        <div><label>Descripción</label><textarea id="m-desc" placeholder="Comportamiento, historia, cuidados especiales..."></textarea></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" onclick="closeModal('modal-mascota')">Cancelar</button>
+      <button class="btn btn-primary" onclick="saveMascota()">Guardar</button>
+    </div>
+  </div>
+</div>
+
+<!-- CLIENTE MODAL -->
+<div class="modal-overlay" id="modal-cliente">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title" id="modal-cliente-title">Nuevo cliente</span>
+      <button class="close-btn" onclick="closeModal('modal-cliente')">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="c-id">
+      <div class="form-row form-row-2">
+        <div><label>Nombre completo *</label><input id="c-nombre" placeholder="Ana García"></div>
+        <div><label>Identificación</label><input id="c-doc" placeholder="CC / Pasaporte"></div>
+      </div>
+      <div class="form-row form-row-2">
+        <div><label>Email *</label><input id="c-email" type="email" placeholder="correo@ejemplo.com"></div>
+        <div><label>Teléfono</label><input id="c-tel" placeholder="+57 300 000 0000"></div>
+      </div>
+      <div class="form-row form-row-2">
+        <div><label>Ciudad</label><input id="c-ciudad" placeholder="Bogotá"></div>
+        <div><label>Tipo de vivienda</label>
+          <select id="c-vivienda"><option value="">—</option><option>Casa propia</option><option>Apartamento</option><option>Arrendado</option><option>Otro</option></select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div><label>Notas</label><textarea id="c-notas" placeholder="Preferencias, experiencia con mascotas..."></textarea></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" onclick="closeModal('modal-cliente')">Cancelar</button>
+      <button class="btn btn-primary" onclick="saveCliente()">Guardar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ADOPCION MODAL -->
+<div class="modal-overlay" id="modal-adopcion">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title" id="modal-adopcion-title">Nueva adopción</span>
+      <button class="close-btn" onclick="closeModal('modal-adopcion')">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="a-id">
+      <div class="form-row form-row-2">
+        <div><label>Mascota *</label>
+          <select id="a-mascota"></select>
+        </div>
+        <div><label>Cliente *</label>
+          <select id="a-cliente"></select>
+        </div>
+      </div>
+      <div class="form-row form-row-2">
+        <div><label>Fecha *</label><input id="a-fecha" type="date"></div>
+        <div><label>Estado</label>
+          <select id="a-estado"><option>Pendiente</option><option>Aprobada</option><option>Rechazada</option></select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div><label>Notas</label><textarea id="a-notas" placeholder="Observaciones del proceso..."></textarea></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" onclick="closeModal('modal-adopcion')">Cancelar</button>
+      <button class="btn btn-primary" onclick="saveAdopcion()">Guardar</button>
+    </div>
+  </div>
+</div>
+
+<!-- VISITA MODAL -->
+<div class="modal-overlay" id="modal-visita">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title" id="modal-visita-title">Agendar visita</span>
+      <button class="close-btn" onclick="closeModal('modal-visita')">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="v-id">
+      <div class="form-row form-row-2">
+        <div><label>Cliente *</label><select id="v-cliente"></select></div>
+        <div><label>Mascota</label><select id="v-mascota"></select></div>
+      </div>
+      <div class="form-row form-row-2">
+        <div><label>Fecha *</label><input id="v-fecha" type="date"></div>
+        <div><label>Hora *</label><input id="v-hora" type="time"></div>
+      </div>
+      <div class="form-row form-row-2">
+        <div><label>Motivo</label>
+          <select id="v-motivo">
+            <option>Conocer mascota</option>
+            <option>Seguimiento post-adopción</option>
+            <option>Entrevista</option>
+            <option>Otro</option>
+          </select>
+        </div>
+        <div><label>Estado</label>
+          <select id="v-estado"><option>Pendiente</option><option>Confirmada</option><option>Realizada</option><option>Cancelada</option></select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div><label>Notas</label><textarea id="v-notas" placeholder="Instrucciones, detalles..."></textarea></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" onclick="closeModal('modal-visita')">Cancelar</button>
+      <button class="btn btn-primary" onclick="saveVisita()">Guardar</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<!-- ============================================================
+     SCRIPTS DEL REPOSITORIO (datos, lógica de negocio)
+     Orden: ENV (datos) → librerias (funciones base) →
+            librerias_adopcion (funciones adopción) →
+            persistencia (localStorage) → integracion (puente UI)
+============================================================ -->
+<script src="./js/ENV.js"></script>
+<script src="./js/librerias.js"></script>
+<script src="./js/librerias_adopcion.js"></script>
+<script src="./js/persistencia.js"></script>
+<script src="./js/menuPrincipal.js"></script>
+<script src="./js/crearClientes.js"></script>
+<script src="./js/listarClientes.js"></script>
+<script src="./js/crearMascota.js"></script>
+<script src="./js/listarMascotas.js"></script>
+<script src="./js/crearAdopcion.js"></script> 
+<script src="./js/listarAdopciones.js"></script>
+<script src="./js/integracion.js"></script>
+</body>
+</html>
